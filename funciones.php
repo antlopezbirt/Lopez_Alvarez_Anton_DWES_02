@@ -2,51 +2,7 @@
 
 declare(strict_types = 1);
 
-// Valida un DNI usando el algoritmo de módulo 23
-function validarDNI(string $dni) {
-    $numero = (int) substr($dni, 0, 8);
-    $letra = substr($dni, -1, 1);
-
-    $letraValida = substr('TRWAGMYFPDXBNJZSQVHLCKE', $numero % 23, 1);
-
-    if ($letra === $letraValida) return true;
-    
-    return false;
-}
-
-// Valida un usuario comprobando que exista en la estructura de datos
-function validarUsuario(string $nombre, string $apellidos, string $dni) {
-    foreach (USUARIOS as $usuario) {
-        if ($usuario["nombre"] === $nombre && 
-            $usuario["apellido"] === $apellidos && 
-            $usuario["dni"] === $dni) 
-            return true;
-    }
-
-    return false;
-}
-
-// Valida una fecha de inicio, comprobando que sea mayor que la actual
-function validarFecha(string $fecha) {
-    return (strtotime($fecha) > time());
-}
-
-// Valida una duración, comprobando que se encuentre en el rango requerido
-function validarDuracion(int $duracion) {
-    return ($duracion >= 1 && $duracion <= 30);
-}
-
-// Valida la disponibilidad de un modelo, comprobando los datos
-function validarModelo(int $modelo) {
-    global $coches;
-    foreach ($coches as $coche) {
-        if ($coche["id"] === $modelo && $coche["disponible"] === true)
-            return true;
-    }
-
-    return false;
-}
-
+// Función que usa a todas las demás.
 // Coordina la validación de todos los datos enviados desde el formulario
 function validarFormulario() {
 
@@ -117,4 +73,50 @@ function validarFormulario() {
     } else {
         return $mensajes;
     }
+}
+
+
+// Valida un DNI usando el algoritmo de módulo 23
+function validarDNI(string $dni) {
+    $numero = (int) substr($dni, 0, 8);
+    $letra = substr($dni, -1, 1);
+
+    $letraValida = substr('TRWAGMYFPDXBNJZSQVHLCKE', $numero % 23, 1);
+
+    if ($letra === $letraValida) return true;
+    
+    return false;
+}
+
+// Valida un usuario comprobando que exista en la estructura de datos
+function validarUsuario(string $nombre, string $apellidos, string $dni) {
+    foreach (USUARIOS as $usuario) {
+        if ($usuario["nombre"] === $nombre && 
+            $usuario["apellido"] === $apellidos && 
+            $usuario["dni"] === $dni) 
+            return true;
+    }
+
+    return false;
+}
+
+// Valida una fecha de inicio, comprobando que sea mayor que la actual
+function validarFecha(string $fecha) {
+    return (strtotime($fecha) > time());
+}
+
+// Valida una duración, comprobando que se encuentre en el rango requerido
+function validarDuracion(int $duracion) {
+    return ($duracion >= 1 && $duracion <= 30);
+}
+
+// Valida la disponibilidad de un modelo, comprobando los datos
+function validarModelo(int $modelo) {
+    global $coches;
+    foreach ($coches as $coche) {
+        if ($coche["id"] === $modelo && $coche["disponible"] === true)
+            return true;
+    }
+
+    return false;
 }
