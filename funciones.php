@@ -9,70 +9,67 @@ function validarFormulario() {
     // Este boolean controla si alguna validación ha fallado
     $validado = true;
     // La cadena va acumulando cada mensaje de error para mostrarlos al finalizar
-    $mensajes = '';
+    $_SESSION['errores'] = '';
 
     // Comprobación nombre vacío
-    if (trim($_POST['nombre']) === '') {
-        $mensajes .= "<span style='background: red;'>Nombre está vacío.<br>";
+    if (trim($_SESSION['usuario']['nombre']) === '') {
+        $_SESSION['errores'] .= "<span style='background: red;'>Nombre está vacío.<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>Nombre: {$_POST['nombre']}.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>Nombre: {$_SESSION['usuario']['nombre']}.<br>";
     }
     
     // Comprobación apellidos vacíos
-    if (trim($_POST['apellidos']) === '') {
-        $mensajes .= "<span style='background: red;'>Apellidos está vacío<br>";
+    if (trim($_SESSION['usuario']['apellidos']) === '') {
+        $_SESSION['errores'] .= "<span style='background: red;'>Apellidos está vacío<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>Apellidos: {$_POST['apellidos']}.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>Apellidos: {$_SESSION['usuario']['apellidos']}.<br>";
     }
     
     // Valida DNI
-    if (!validarDNI($_POST['dni'])) {
-        $mensajes .= "<span style='background: red;'>DNI no válido: {$_POST['dni']}<br>";
+    if (!validarDNI($_SESSION['usuario']['dni'])) {
+        $_SESSION['errores'] .= "<span style='background: red;'>DNI no válido: {$_SESSION['usuario']['dni']}<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>DNI: {$_POST['dni']}.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>DNI: {$_SESSION['usuario']['dni']}.<br>";
     }
     
     // Valida usuario
-    if (!validarUsuario($_POST['nombre'], $_POST['apellidos'], $_POST['dni'])) {
-        $mensajes .= "<span style='background: red;'>El usuario no es válido<br>";
+    if (!validarUsuario($_SESSION['usuario']['nombre'], $_SESSION['usuario']['apellidos'], $_SESSION['usuario']['dni'])) {
+        $_SESSION['errores'] .= "<span style='background: red;'>El usuario no es válido<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>El usuario es válido.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>El usuario es válido.<br>";
     }
     
     // Valida fecha
-    if (!validarFecha($_POST['fecha'])) {
-        $mensajes .= "<span style='background: red;'>La fecha ({$_POST['fecha']}) debe ser posterior a la actual<br>";
+    if (!validarFecha($_SESSION['reserva']['fecha'])) {
+        $_SESSION['errores'] .= "<span style='background: red;'>La fecha ({$_SESSION['reserva']['fecha']}) debe ser posterior a la actual<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>La fecha es válida.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>La fecha es válida.<br>";
     }
     
     // Valida duración
-    if (!validarDuracion((int) $_POST['duracion'])) {
-        $mensajes .= "<span style='background: red;'>La duración debe ser un número entero entre 1 y 30 (ambos incluidos).<br>";
+    if (!validarDuracion((int) $_SESSION['reserva']['duracion'])) {
+        $_SESSION['errores'] .= "<span style='background: red;'>La duración debe ser un número entero entre 1 y 30 (ambos incluidos).<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>Duración: {$_POST['duracion']} días.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>Duración: {$_SESSION['reserva']['duracion']} días.<br>";
     }
     
     // Valida disponibilidad modelo
-    if (!validarModelo((int) $_POST['modelo'])) {
-        $mensajes .= "<span style='background: red;'>Ese modelo no está disponible.<br>";
+    if (!validarModelo((int) $_SESSION['reserva']['modelo'])) {
+        $_SESSION['errores'] .= "<span style='background: red;'>Ese modelo no está disponible.<br>";
         $validado = false;
     } else {
-        $mensajes .= "<span style='background: green;'>El modelo está disponible.<br>";
+        $_SESSION['errores'] .= "<span style='background: green;'>El modelo está disponible.<br>";
     }
     
     // Si todo ha ido bien, devuelve el mensaje de éxito, en caso contrario los mensajes
-    if ($validado) {
-        return "<h1>" . $_POST['nombre'] . " " . $_POST['apellidos'] . "</h1><br><img src='img/{$_POST['modelo']}.jpg'>";
-    } else {
-        return $mensajes;
-    }
+    if ($validado) header('Location: exito.php');
+    else header('Location: fracaso.php');
 }
 
 

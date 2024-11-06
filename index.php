@@ -17,7 +17,7 @@
             <option value="4">Subaru Impreza 555</option>
         </select><br>
         <label for="fecha">Fecha reserva: </label><input type="date" name="fecha"><br>
-        <label for="duracion">Duración: </label><input type="number" name="duracion"> días<br>
+        <label for="duracion">Duración: </label><input type="number" name="duracion" placeholder="5"> días<br>
         <br>
         <input type="submit" value="Enviar">
     </form>
