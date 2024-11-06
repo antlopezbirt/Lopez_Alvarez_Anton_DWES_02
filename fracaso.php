@@ -1,5 +1,7 @@
 <?php
     session_start();
+    // Si no hay datos de validación redirige al formulario
+    if (!isset($_SESSION['errores'])) header('Location: index.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -14,6 +16,6 @@
 </html>
 <?php
     // La sesión se destruye al volver al formulario por no tener session_start(),
-    // pero aquí se destruye explícitamente
+    // pero aquí se destruye explícitamente ya que finaliza el proceso.
     session_destroy();
 ?>

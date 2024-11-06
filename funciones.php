@@ -21,7 +21,7 @@ function validarFormulario() {
     
     // Comprobación apellidos vacíos
     if (trim($_SESSION['usuario']['apellidos']) === '') {
-        $_SESSION['errores'] .= "<span style='background: red;'>Apellidos está vacío<br>";
+        $_SESSION['errores'] .= "<span style='background: red;'>Apellidos está vacío.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>Apellidos: {$_SESSION['usuario']['apellidos']}.<br>";
@@ -29,7 +29,7 @@ function validarFormulario() {
     
     // Valida DNI
     if (!validarDNI($_SESSION['usuario']['dni'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>DNI no válido: {$_SESSION['usuario']['dni']}<br>";
+        $_SESSION['errores'] .= "<span style='background: red;'>DNI no válido.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>DNI: {$_SESSION['usuario']['dni']}.<br>";
@@ -37,7 +37,7 @@ function validarFormulario() {
     
     // Valida usuario
     if (!validarUsuario($_SESSION['usuario']['nombre'], $_SESSION['usuario']['apellidos'], $_SESSION['usuario']['dni'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>El usuario no es válido<br>";
+        $_SESSION['errores'] .= "<span style='background: red;'>El usuario no es válido.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>El usuario es válido.<br>";
@@ -45,7 +45,7 @@ function validarFormulario() {
     
     // Valida fecha
     if (!validarFecha($_SESSION['reserva']['fecha'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>La fecha ({$_SESSION['reserva']['fecha']}) debe ser posterior a la actual<br>";
+        $_SESSION['errores'] .= "<span style='background: red;'>La fecha debe ser posterior a la actual.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>La fecha es válida.<br>";
