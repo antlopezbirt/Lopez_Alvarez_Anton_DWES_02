@@ -2,6 +2,7 @@
 
 declare(strict_types = 1);
 
+
 // Función que usa a todas las demás.
 // Coordina la validación de todos los datos enviados desde el formulario
 function validarFormulario() {
@@ -60,7 +61,7 @@ function validarFormulario() {
     }
     
     // Valida disponibilidad modelo
-    if (!validarModelo($_SESSION['reserva']['modelo'])) {
+    if (!validarModelo($_SESSION['reserva']['modelo'], $_SESSION['coches'])) {
         $_SESSION['errores'] .= "<span style='background: red;'>Ese modelo no está disponible.<br>";
         $validado = false;
     } else {
@@ -107,16 +108,21 @@ function validarDuracion(int $duracion) {
     return ($duracion >= 1 && $duracion <= 30);
 }
 
-// Valida la disponibilidad de un modelo, comprobando los datos
-function validarModelo(string $modelo) {
-    global $coches;
+// Valida la disponibilidad de un modelo, chequeando la estructura datos
+function validarModelo(string $modelo, array $coches) {
     foreach ($coches as $coche) {
-        if ($coche['modelo'] === $modelo && $coche['disponible'] === true) {
-            // Este ID se podría indicar directamente en el value de los options del formulario.
-            $_SESSION['reserva']['idModelo'] = $coche['id'];
-            return true;
+        if ($coche['modelo'] === $modelo) {
+            // Si está marcado como disponible,
+            if ($coche['disponible'] === true || 
+                // o si la fecha de inicio de reserva es posterior al fin de la ocupación del vehículo,
+                strtotime($coche['fecha_fin']) < strtotime(($_SESSION['reserva']['fecha'])) ||
+                // o si el fin de la reserva (inicio + duración) es anterior al inicio de la ocupación...
+                strtotime($coche['fecha_inicio']) > (strtotime($_SESSION['reserva']['fecha']) + $_SESSION['reserva']['duracion'] * 60 * 60 * 24)
+            ) { // ...se interpreta que el vehículo está libre.
+                $_SESSION['reserva']['idModelo'] = $coche['id']; // Este ID se podría enviar directamente en el value del formulario.
+                return true;
+            }
         }
-            
     }
 
     return false;

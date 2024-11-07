@@ -1,9 +1,12 @@
 <?php
 session_start();
-require_once('datos.php');
+require_once('usuarios_y_coches.php');
 include_once('funciones.php');
 
-//var_dump($_POST); // Para testear
+// Recoge en la sesión solo los datos de los coches de usuarios_y_coches.php
+// Con los datos de usuarios no haría falta ya que las constantes tienen scope global
+// https://www.php.net/manual/en/language.constants.php 
+$_SESSION['coches'] = $coches;
 
 // Si se reciben datos los pasa a la sesión y los valida, en caso contrario saca un aviso.
 if (count($_POST) > 0) {
