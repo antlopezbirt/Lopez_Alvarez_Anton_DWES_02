@@ -60,14 +60,14 @@ function validarFormulario() {
     }
     
     // Valida disponibilidad modelo
-    if (!validarModelo((int) $_SESSION['reserva']['modelo'])) {
+    if (!validarModelo($_SESSION['reserva']['modelo'])) {
         $_SESSION['errores'] .= "<span style='background: red;'>Ese modelo no está disponible.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>El modelo está disponible.<br>";
     }
     
-    // Si todo ha ido bien, devuelve el mensaje de éxito, en caso contrario los mensajes
+    // Si todo ha ido bien, redireccione a la página de éxito, en caso contrario a la de fracaso.
     if ($validado) header('Location: exito.php');
     else header('Location: fracaso.php');
 }
@@ -88,9 +88,9 @@ function validarDNI(string $dni) {
 // Valida un usuario comprobando que exista en la estructura de datos
 function validarUsuario(string $nombre, string $apellidos, string $dni) {
     foreach (USUARIOS as $usuario) {
-        if ($usuario["nombre"] === $nombre && 
-            $usuario["apellido"] === $apellidos && 
-            $usuario["dni"] === $dni) 
+        if ($usuario['nombre'] === $nombre && 
+            $usuario['apellido'] === $apellidos && 
+            $usuario['dni'] === $dni) 
             return true;
     }
 
@@ -108,11 +108,15 @@ function validarDuracion(int $duracion) {
 }
 
 // Valida la disponibilidad de un modelo, comprobando los datos
-function validarModelo(int $modelo) {
+function validarModelo(string $modelo) {
     global $coches;
     foreach ($coches as $coche) {
-        if ($coche["id"] === $modelo && $coche["disponible"] === true)
+        if ($coche['modelo'] === $modelo && $coche['disponible'] === true) {
+            // Este ID se podría indicar directamente en el value de los options del formulario.
+            $_SESSION['reserva']['idModelo'] = $coche['id'];
             return true;
+        }
+            
     }
 
     return false;

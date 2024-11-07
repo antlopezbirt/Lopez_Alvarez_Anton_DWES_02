@@ -13,7 +13,7 @@
 <body>
     <h1><?=$_SESSION['usuario']['nombre'] . " " . $_SESSION['usuario']['apellidos']?></h1>
     <br>
-    <img src='img/<?=$_SESSION['reserva']['modelo']?>.jpg'>
+    <img src='img/<?=$_SESSION['reserva']['idModelo']?>.jpg'>
 </body>
 </html>
 <?php
