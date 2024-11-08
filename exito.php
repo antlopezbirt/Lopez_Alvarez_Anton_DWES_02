@@ -1,7 +1,7 @@
 <?php
     session_start();
     // Si no hay datos redirige al formulario
-    if (!isset($_SESSION['usuario'])) header('Location: index.php');
+    if (!isset($_SESSION['usuario']) || !isset($_SESSION['reserva'])) header('Location: index.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
