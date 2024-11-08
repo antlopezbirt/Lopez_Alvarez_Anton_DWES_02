@@ -7,70 +7,32 @@ declare(strict_types = 1);
 // Coordina la validación de todos los datos enviados desde el formulario
 function validarFormulario() {
 
-    // Este boolean controla si alguna validación ha fallado
-    $validado = true;
-    // La cadena va acumulando cada mensaje de error para mostrarlos al finalizar
-    $_SESSION['errores'] = '';
-
     // Comprobación nombre vacío
-    if (trim($_SESSION['usuario']['nombre']) === '') {
-        $_SESSION['errores'] .= "<span style='background: red;'>Nombre está vacío.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>Nombre: {$_SESSION['usuario']['nombre']}.<br>";
-    }
+    $_SESSION['validado']['nombre'] = (trim($_SESSION['usuario']['nombre']) === '') ? false : true;
     
     // Comprobación apellidos vacíos
-    if (trim($_SESSION['usuario']['apellidos']) === '') {
-        $_SESSION['errores'] .= "<span style='background: red;'>Apellidos está vacío.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>Apellidos: {$_SESSION['usuario']['apellidos']}.<br>";
-    }
+    $_SESSION['validado']['apellidos'] = (trim($_SESSION['usuario']['apellidos']) === '') ? false : true;
     
     // Valida DNI
-    if (!validarDNI($_SESSION['usuario']['dni'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>DNI no válido.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>DNI: {$_SESSION['usuario']['dni']}.<br>";
-    }
-    
+    $_SESSION['validado']['dni'] = (!validarDNI($_SESSION['usuario']['dni'])) ? false : true;
+        
     // Valida usuario
-    if (!validarUsuario($_SESSION['usuario']['nombre'], $_SESSION['usuario']['apellidos'], $_SESSION['usuario']['dni'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>El usuario no es válido.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>El usuario es válido.<br>";
-    }
-    
+    $_SESSION['validado']['usuario'] = (!validarUsuario($_SESSION['usuario']['nombre'], 
+                                            $_SESSION['usuario']['apellidos'], 
+                                            $_SESSION['usuario']['dni'])) ? false : true;
     // Valida fecha
-    if (!validarFecha($_SESSION['reserva']['fecha'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>La fecha debe ser posterior a la actual.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>La fecha es válida.<br>";
-    }
-    
+    $_SESSION['validado']['fecha'] = (!validarFecha($_SESSION['reserva']['fecha'])) ? false : true;
+
     // Valida duración
-    if (!validarDuracion((int) $_SESSION['reserva']['duracion'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>La duración debe ser un número entero entre 1 y 30 (ambos incluidos).<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>Duración: {$_SESSION['reserva']['duracion']} días.<br>";
-    }
-    
+    $_SESSION['validado']['duracion'] = (!validarDuracion((int) $_SESSION['reserva']['duracion'])) ? false : true;
+
     // Valida disponibilidad modelo
-    if (!validarModelo($_SESSION['reserva']['modelo'], $_SESSION['coches'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>El modelo no está disponible en esas fechas.<br>";
-        $validado = false;
-    } else {
-        $_SESSION['errores'] .= "<span style='background: green;'>El modelo está disponible.<br>";
-    }
+    $_SESSION['validado']['disponible'] = (!validarModelo($_SESSION['reserva']['modelo'], 
+                                                $_SESSION['coches'])) ? false : true;
     
-    // Si todo ha ido bien, redireccione a la página de éxito, en caso contrario a la de fracaso.
-    if ($validado) header('Location: exito.php');
-    else header('Location: fracaso.php');
+    // Si no hay ningún FALSE en el array de validación, redirecciona a la página de éxito, en caso contrario a la de fracaso.
+    if (array_search(false, $_SESSION['validado'])) header('Location: fracaso.php');
+    else header('Location: exito.php');
 }
 
 
@@ -111,10 +73,11 @@ function validarDuracion(int $duracion) {
 // Valida la disponibilidad de un modelo, chequeando la estructura datos
 function validarModelo(string $modelo, array $coches) {
 
-    // Como hay que tener en cuenta la fecha, antes de iterar el array de coches analiza si la fecha es válida
-    if (validarFecha($_SESSION['reserva']['fecha'])) {
+    // Como hay que calcular si el modelo está disponible en para determinadas fechas,
+    // primero se comprueba la validez de la fecha y la duración. Si no son válidas, devolverá FALSE directamente.
+    if (validarFecha($_SESSION['reserva']['fecha']) && validarDuracion((int) $_SESSION['reserva']['duracion'])) {
         foreach ($coches as $coche) {
-            // Si coincide el modelo inicia el análisis de la disponibilidad
+            // Si coincide el modelo, inicia el análisis de la disponibilidad
             if ($coche['modelo'] === $modelo) {
                 // Si está marcado como disponible,
                 if ($coche['disponible'] === true || 
@@ -123,7 +86,7 @@ function validarModelo(string $modelo, array $coches) {
                     // o si el fin de la reserva (inicio + duración) es anterior al inicio de la ocupación...
                     strtotime($coche['fecha_inicio']) > (strtotime($_SESSION['reserva']['fecha']) + $_SESSION['reserva']['duracion'] * 60 * 60 * 24)
                 ) { // ...se interpreta que el vehículo está libre.
-                    // Guarda el ID del modelo para luego acceder a la imagen. Se podría enviar directamente en el value del formulario.
+                    // Guarda el ID del modelo para luego acceder a la imagen. Se podría enviar directamente desde el value del formulario.
                     $_SESSION['reserva']['idModelo'] = $coche['id'];
                     return true;
                 }
