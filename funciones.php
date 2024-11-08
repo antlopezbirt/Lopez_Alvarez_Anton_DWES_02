@@ -62,7 +62,7 @@ function validarFormulario() {
     
     // Valida disponibilidad modelo
     if (!validarModelo($_SESSION['reserva']['modelo'], $_SESSION['coches'])) {
-        $_SESSION['errores'] .= "<span style='background: red;'>Ese modelo no está disponible.<br>";
+        $_SESSION['errores'] .= "<span style='background: red;'>El modelo no está disponible en esas fechas.<br>";
         $validado = false;
     } else {
         $_SESSION['errores'] .= "<span style='background: green;'>El modelo está disponible.<br>";
@@ -110,17 +110,23 @@ function validarDuracion(int $duracion) {
 
 // Valida la disponibilidad de un modelo, chequeando la estructura datos
 function validarModelo(string $modelo, array $coches) {
-    foreach ($coches as $coche) {
-        if ($coche['modelo'] === $modelo) {
-            // Si está marcado como disponible,
-            if ($coche['disponible'] === true || 
-                // o si la fecha de inicio de reserva es posterior al fin de la ocupación del vehículo,
-                strtotime($coche['fecha_fin']) < strtotime(($_SESSION['reserva']['fecha'])) ||
-                // o si el fin de la reserva (inicio + duración) es anterior al inicio de la ocupación...
-                strtotime($coche['fecha_inicio']) > (strtotime($_SESSION['reserva']['fecha']) + $_SESSION['reserva']['duracion'] * 60 * 60 * 24)
-            ) { // ...se interpreta que el vehículo está libre.
-                $_SESSION['reserva']['idModelo'] = $coche['id']; // Este ID se podría enviar directamente en el value del formulario.
-                return true;
+
+    // Como hay que tener en cuenta la fecha, antes de iterar el array de coches analiza si la fecha es válida
+    if (validarFecha($_SESSION['reserva']['fecha'])) {
+        foreach ($coches as $coche) {
+            // Si coincide el modelo inicia el análisis de la disponibilidad
+            if ($coche['modelo'] === $modelo) {
+                // Si está marcado como disponible,
+                if ($coche['disponible'] === true || 
+                    // o si la fecha de inicio de reserva es posterior al fin de la ocupación del vehículo,
+                    strtotime($coche['fecha_fin']) < strtotime(($_SESSION['reserva']['fecha'])) ||
+                    // o si el fin de la reserva (inicio + duración) es anterior al inicio de la ocupación...
+                    strtotime($coche['fecha_inicio']) > (strtotime($_SESSION['reserva']['fecha']) + $_SESSION['reserva']['duracion'] * 60 * 60 * 24)
+                ) { // ...se interpreta que el vehículo está libre.
+                    // Guarda el ID del modelo para luego acceder a la imagen. Se podría enviar directamente en el value del formulario.
+                    $_SESSION['reserva']['idModelo'] = $coche['id'];
+                    return true;
+                }
             }
         }
     }
